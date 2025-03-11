@@ -15,7 +15,7 @@ test "A Aeolian Minor" {
         mt.Note.new(.G, .Natural),
         mt.Note.new(.A, .Natural),
     };
-    try util.validate(key, mt.MinorMode.Aeolian.steps(), expected);
+    try util.validate(key, mt.Mode.AeolianMinor.steps(), expected);
 }
 
 test "B Aeolian Minor" {
@@ -30,7 +30,7 @@ test "B Aeolian Minor" {
         mt.Note.new(.A, .Natural),
         mt.Note.new(.B, .Natural),
     };
-    try util.validate(key, mt.MinorMode.Aeolian.steps(), expected);
+    try util.validate(key, mt.Mode.AeolianMinor.steps(), expected);
 }
 
 test "C Aeolian Minor" {
@@ -45,7 +45,7 @@ test "C Aeolian Minor" {
         mt.Note.new(.B, .Flat),
         mt.Note.new(.C, .Natural),
     };
-    try util.validate(key, mt.MinorMode.Aeolian.steps(), expected);
+    try util.validate(key, mt.Mode.AeolianMinor.steps(), expected);
 }
 
 test "D Aeolian Minor" {
@@ -60,7 +60,7 @@ test "D Aeolian Minor" {
         mt.Note.new(.C, .Natural),
         mt.Note.new(.D, .Natural),
     };
-    try util.validate(key, mt.MinorMode.Aeolian.steps(), expected);
+    try util.validate(key, mt.Mode.AeolianMinor.steps(), expected);
 }
 
 test "E Aeolian Minor" {
@@ -75,7 +75,7 @@ test "E Aeolian Minor" {
         mt.Note.new(.D, .Natural),
         mt.Note.new(.E, .Natural),
     };
-    try util.validate(key, mt.MinorMode.Aeolian.steps(), expected);
+    try util.validate(key, mt.Mode.AeolianMinor.steps(), expected);
 }
 
 test "G Aeolian Minor" {
@@ -90,5 +90,5 @@ test "G Aeolian Minor" {
         mt.Note.new(.F, .Natural),
         mt.Note.new(.G, .Natural),
     };
-    try util.validate(key, mt.MinorMode.Aeolian.steps(), expected);
+    try util.validate(key, mt.Mode.AeolianMinor.steps(), expected);
 }

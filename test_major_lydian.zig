@@ -15,7 +15,7 @@ test "C Major Lydian" {
         mt.Note.new(.B, .Natural),
         mt.Note.new(.C, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Lydian.steps(), expected);
+    try util.validate(key, mt.Mode.LydianMajor.steps(), expected);
 }
 
 test "D Major Lydian" {
@@ -30,7 +30,7 @@ test "D Major Lydian" {
         mt.Note.new(.C, .Sharp),
         mt.Note.new(.D, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Lydian.steps(), expected);
+    try util.validate(key, mt.Mode.LydianMajor.steps(), expected);
 }
 
 test "E Major Lydian" {
@@ -45,7 +45,7 @@ test "E Major Lydian" {
         mt.Note.new(.D, .Sharp),
         mt.Note.new(.E, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Lydian.steps(), expected);
+    try util.validate(key, mt.Mode.LydianMajor.steps(), expected);
 }
 
 test "F Major Lydian" {
@@ -60,7 +60,7 @@ test "F Major Lydian" {
         mt.Note.new(.E, .Natural),
         mt.Note.new(.F, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Lydian.steps(), expected);
+    try util.validate(key, mt.Mode.LydianMajor.steps(), expected);
 }
 
 test "G Major Lydian" {
@@ -75,7 +75,7 @@ test "G Major Lydian" {
         mt.Note.new(.F, .Sharp),
         mt.Note.new(.G, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Lydian.steps(), expected);
+    try util.validate(key, mt.Mode.LydianMajor.steps(), expected);
 }
 
 test "A Major Lydian" {
@@ -90,7 +90,7 @@ test "A Major Lydian" {
         mt.Note.new(.G, .Sharp),
         mt.Note.new(.A, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Lydian.steps(), expected);
+    try util.validate(key, mt.Mode.LydianMajor.steps(), expected);
 }
 
 test "B Major Lydian" {
@@ -105,5 +105,5 @@ test "B Major Lydian" {
         mt.Note.new(.A, .Sharp),
         mt.Note.new(.B, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Lydian.steps(), expected);
+    try util.validate(key, mt.Mode.LydianMajor.steps(), expected);
 }

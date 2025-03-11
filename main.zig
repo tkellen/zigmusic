@@ -101,11 +101,11 @@ pub const Scale = struct {
         notes[position] = self.root;
         position += 1;
         var note = self.root;
-        var stepPosition = note.position();
+        var notePosition = note.position();
 
         for (self.steps) |step| {
-            stepPosition = (stepPosition + step) % 12;
-            note = note.next().newFromStep(stepPosition);
+            notePosition = (notePosition + step) % 12;
+            note = note.next().newFromStep(notePosition);
             notes[position] = note;
             position += 1;
         }
@@ -113,74 +113,46 @@ pub const Scale = struct {
     }
 };
 
-pub const SharedMode = enum {
+pub const Mode = enum {
+    IonianMajor, // Standard major scale.
+    LydianMajor, // Raised 4th degree, dreamy sound.
+    MixolydianMajor, // Lowered 7th degree, dominant feel.
+    PentatonicMajor, // Five notes, widely used in rock, blues, and folk.
+    BluesMajor, // Pentatonic variation with a "blue note", widely used in blues and jazz.
+    HarmonicMajor, // Augmented second interval, widly used in classical and Middle Eastern music.
+    AeolianMinor, // Standard minor scale.
+    DorianMinor, // Raised 6th degree, used in jazz and modal music.
+    PhrygianMinor, // Lowered 2nd degree, Spanish or Eastern sound.
+    LocrianMinor, // Lowered 2nd and 5th, dissonant, used in jazz and modern metal.
+    PentatonicMinor, // Omits 2nd and 6th degrees. Widely used in blues, rock, and folk music.
+    BluesMinor, // Pentatonic variation with a "blue note", widely used in blues and jazz.
+    HarmonicMinor, // Raised 7th degree, classical, or "Middle Eastern" character
+    MelodicMinor, // Raised 6th and 7th when ascending, often reverts to natural minor (Aeolian) when descending. Jazz and classical music.
     Chromatic,
     WholeTone,
 
-    pub fn steps(self: SharedMode) []const u8 {
+    pub fn steps(self: Mode) []const u8 {
         return switch (self) {
+            .IonianMajor => &[_]u8{ 2, 2, 1, 2, 2, 2, 1 },
+            .LydianMajor => &[_]u8{ 2, 2, 2, 1, 2, 2, 1 },
+            .MixolydianMajor => &[_]u8{ 2, 2, 1, 2, 2, 1, 2 },
+            .PentatonicMajor => &[_]u8{ 2, 2, 3, 2, 3 },
+            .BluesMajor => &[_]u8{ 2, 1, 1, 3, 2, 3 },
+            .HarmonicMajor => &[_]u8{ 2, 1, 2, 2, 1, 3, 1 },
+            .AeolianMinor => &[_]u8{ 2, 1, 2, 2, 1, 2, 2 },
+            .DorianMinor => &[_]u8{ 2, 1, 2, 2, 2, 1, 2 },
+            .PhrygianMinor => &[_]u8{ 1, 2, 2, 2, 1, 2, 2 },
+            .LocrianMinor => &[_]u8{ 1, 2, 2, 1, 2, 2, 2 },
+            .PentatonicMinor => &[_]u8{ 3, 2, 2, 3, 2 },
+            .BluesMinor => &[_]u8{ 3, 2, 1, 1, 3, 2 },
+            .HarmonicMinor => &[_]u8{ 2, 1, 2, 2, 1, 3, 1 },
+            .MelodicMinor => &[_]u8{ 2, 1, 2, 2, 2, 2, 1 },
             .Chromatic => &[_]u8{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
             .WholeTone => &[_]u8{ 2, 2, 2, 2, 2, 2 },
         };
     }
-};
 
-pub const MajorMode = enum {
-    Ionian, // Standard major scale.
-    Lydian, // Raised 4th degree, dreamy sound.
-    Mixolydian, // Lowered 7th degree, dominant feel.
-    Pentatonic, // Five notes, widely used in rock, blues, and folk.
-    Blues, // Pentatonic variation with a "blue note", widely used in blues and jazz.
-    Chromatic, // Twelve notes, no tonal center.
-    WholeTone, // Six whole steps, ambiguous, dreamy.
-    Harmonic, // Augmented second interval, widly used in classical and Middle Eastern music.
-
-    pub fn steps(self: MajorMode) []const u8 {
-        return switch (self) {
-            .Ionian => &[_]u8{ 2, 2, 1, 2, 2, 2, 1 },
-            .Lydian => &[_]u8{ 2, 2, 2, 1, 2, 2, 1 },
-            .Mixolydian => &[_]u8{ 2, 2, 1, 2, 2, 1, 2 },
-            .Pentatonic => &[_]u8{ 2, 2, 3, 2, 3 },
-            .Blues => &[_]u8{ 2, 1, 1, 3, 2, 3 },
-            .Chromatic => SharedMode.Chromatic.steps(),
-            .WholeTone => SharedMode.WholeTone.steps(),
-            .Harmonic => &[_]u8{ 2, 1, 2, 2, 1, 3, 1 },
-        };
-    }
-
-    pub fn toString(self: MajorMode) []const u8 {
-        return @tagName(self);
-    }
-};
-
-pub const MinorMode = enum {
-    Aeolian, // Standard minor scale.
-    Dorian, // Raised 6th degree, used in jazz and modal music.
-    Phrygian, // Lowered 2nd degree, Spanish or Eastern sound.
-    Locrian, // Lowered 2nd and 5th, dissonant, used in jazz and modern metal.
-    Pentatonic, // Omits 2nd and 6th degrees. Widely used in blues, rock, and folk music.
-    Blues, // Pentatonic variation with a "blue note", widely used in blues and jazz.
-    Chromatic, // Twelve notes, no tonal center.
-    WholeTone, // Six whole steps, ambiguous, dreamy.
-    Harmonic, // Raised 7th degree, classical, or "Middle Eastern" character
-    Melodic, // Raised 6th and 7th when ascending, often reverts to natural minor (Aeolian) when descending. Jazz and classical music.
-
-    pub fn steps(self: MinorMode) []const u8 {
-        return switch (self) {
-            .Aeolian => &[_]u8{ 2, 1, 2, 2, 1, 2, 2 },
-            .Dorian => &[_]u8{ 2, 1, 2, 2, 2, 1, 2 },
-            .Phrygian => &[_]u8{ 1, 2, 2, 2, 1, 2, 2 },
-            .Locrian => &[_]u8{ 1, 2, 2, 1, 2, 2, 2 },
-            .Pentatonic => &[_]u8{ 3, 2, 2, 3, 2 },
-            .Blues => &[_]u8{ 3, 2, 1, 1, 3, 2 },
-            .Chromatic => SharedMode.Chromatic.steps(),
-            .WholeTone => SharedMode.WholeTone.steps(),
-            .Harmonic => &[_]u8{ 2, 1, 2, 2, 1, 3, 1 },
-            .Melodic => &[_]u8{ 2, 1, 2, 2, 2, 2, 1 },
-        };
-    }
-
-    pub fn toString(self: MinorMode) []const u8 {
+    pub fn toString(self: Mode) []const u8 {
         return @tagName(self);
     }
 };
@@ -188,7 +160,7 @@ pub const MinorMode = enum {
 pub fn main() !void {
     var buffer: [16]Note = undefined;
     const key = Note.new(Alphabet.E, Accidental.Flat);
-    const mode = MajorMode.Ionian;
+    const mode = Mode.IonianMajor;
     const scale = Scale.new(key, mode.steps());
     std.debug.print("Major {s}{s} {s}: ", .{ key.name.toString(), key.accidental.toString(), mode.toString() });
     for (scale.compute(&buffer)) |note| {

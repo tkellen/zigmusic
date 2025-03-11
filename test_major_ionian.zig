@@ -15,7 +15,7 @@ test "C♭ Major Ionian" {
         mt.Note.new(.B, .Flat),
         mt.Note.new(.C, .Flat),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
 
 test "C Major Ionian" {
@@ -30,7 +30,7 @@ test "C Major Ionian" {
         mt.Note.new(.B, .Natural),
         mt.Note.new(.C, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
 
 test "C♯ Major Ionian" {
@@ -45,7 +45,7 @@ test "C♯ Major Ionian" {
         mt.Note.new(.B, .Sharp),
         mt.Note.new(.C, .Sharp),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
 
 test "D♭ Major Ionian" {
@@ -60,7 +60,7 @@ test "D♭ Major Ionian" {
         mt.Note.new(.C, .Natural),
         mt.Note.new(.D, .Flat),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
 
 test "D Major Ionian" {
@@ -75,7 +75,7 @@ test "D Major Ionian" {
         mt.Note.new(.C, .Sharp),
         mt.Note.new(.D, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
 
 test "D♯ Major Ionian" {
@@ -90,7 +90,7 @@ test "D♯ Major Ionian" {
         mt.Note.new(.C, .DoubleSharp),
         mt.Note.new(.D, .Sharp),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
 
 test "E Major Ionian" {
@@ -105,7 +105,7 @@ test "E Major Ionian" {
         mt.Note.new(.D, .Sharp),
         mt.Note.new(.E, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
 
 test "F Major Ionian" {
@@ -120,7 +120,7 @@ test "F Major Ionian" {
         mt.Note.new(.E, .Natural),
         mt.Note.new(.F, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
 
 test "A Major Ionian" {
@@ -135,7 +135,7 @@ test "A Major Ionian" {
         mt.Note.new(.G, .Sharp),
         mt.Note.new(.A, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
 
 test "B Major Ionian" {
@@ -150,5 +150,5 @@ test "B Major Ionian" {
         mt.Note.new(.A, .Sharp),
         mt.Note.new(.B, .Natural),
     };
-    try util.validate(key, mt.MajorMode.Ionian.steps(), expected);
+    try util.validate(key, mt.Mode.IonianMajor.steps(), expected);
 }
