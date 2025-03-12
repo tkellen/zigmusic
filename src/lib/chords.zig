@@ -18,6 +18,22 @@ pub const Tone = enum {
     pub fn toString(self: Tone) ![]const u8 {
         return @tagName(self);
     }
+
+    pub fn scaleDegree(self: Tone) usize {
+        return switch (self) {
+            .Root => 0,
+            .MinorThird => 2,
+            .MajorThird => 2,
+            .PerfectFifth => 4,
+            .DiminishedFifth => 4,
+            .AugmentedFifth => 4,
+            .MinorSeventh => 6,
+            .MajorSeventh => 6,
+            .Ninth => 8,
+            .Eleventh => 10,
+            .Thirteenth => 12,
+        };
+    }
 };
 
 pub const Type = enum {
@@ -32,18 +48,18 @@ pub const Type = enum {
     HalfDiminished7,
     Augmented7,
 
-    pub fn scaleDegrees(self: Type) []const u8 {
+    pub fn scaleDegrees(self: Type) []const Tone {
         return switch (self) {
-            .Major => &[_]u8{ 1, 3, 5 }, // Root, Major Third, Perfect Fifth
-            .Minor => &[_]u8{ 1, 3, 5 }, // Root, Minor Third, Perfect Fifth (depends on mode)
-            .Diminished => &[_]u8{ 1, 3, 5 }, // Root, Minor Third, Diminished Fifth
-            .Augmented => &[_]u8{ 1, 3, 5 }, // Root, Major Third, Augmented Fifth
-            .Major7 => &[_]u8{ 1, 3, 5, 7 }, // Root, Major Third, Perfect Fifth, Major Seventh
-            .Dominant7 => &[_]u8{ 1, 3, 5, 7 }, // Root, Major Third, Perfect Fifth, Minor Seventh
-            .Minor7 => &[_]u8{ 1, 3, 5, 7 }, // Root, Minor Third, Perfect Fifth, Minor Seventh
-            .Diminished7 => &[_]u8{ 1, 3, 5, 7 }, // Root, Minor Third, Diminished Fifth, Diminished Seventh
-            .HalfDiminished7 => &[_]u8{ 1, 3, 5, 7 }, // Root, Minor Third, Diminished Fifth, Minor Seventh
-            .Augmented7 => &[_]u8{ 1, 3, 5, 7 }, // Root, Major Third, Augmented Fifth, Minor Seventh
+            .Major => &[_]Tone{ .Root, .MajorThird, .PerfectFifth },
+            .Minor => &[_]Tone{ .Root, .MinorThird, .PerfectFifth },
+            .Diminished => &[_]Tone{ .Root, .MinorThird, .DiminishedFifth },
+            .Augmented => &[_]Tone{ .Root, .MajorThird, .AugmentedFifth },
+            .Major7 => &[_]Tone{ .Root, .MajorThird, .PerfectFifth, .MajorSeventh },
+            .Dominant7 => &[_]Tone{ .Root, .MajorThird, .PerfectFifth, .MinorSeventh },
+            .Minor7 => &[_]Tone{ .Root, .MinorThird, .PerfectFifth, .MinorSeventh },
+            .Diminished7 => &[_]Tone{ .Root, .MinorThird, .DiminishedFifth, .MinorSeventh },
+            .HalfDiminished7 => &[_]Tone{ .Root, .MinorThird, .DiminishedFifth, .MinorSeventh },
+            .Augmented7 => &[_]Tone{ .Root, .MajorThird, .AugmentedFifth, .MinorSeventh },
         };
     }
 
@@ -60,15 +76,12 @@ pub const Chord = struct {
     pub fn build(self: Chord, chordBuffer: []notes.Note) []notes.Note {
         var scaleBuffer: [16]notes.Note = undefined;
         const scale = self.mode.scale(self.key, &scaleBuffer);
-
-        const degrees = self.chordType.scaleDegrees();
-        const chordSize = @min(degrees.len, chordBuffer.len);
-
-        for (degrees[0..chordSize], 0..) |degree, i| {
-            const index = (degree - 1) % scale.len;
+        const tones = self.chordType.scaleDegrees();
+        const chordSize = @min(tones.len, chordBuffer.len);
+        for (tones[0..chordSize], 0..) |tone, i| {
+            const index = tone.scaleDegree() % scale.len;
             chordBuffer[i] = scale[index];
         }
-
         return chordBuffer[0..chordSize];
     }
 };
