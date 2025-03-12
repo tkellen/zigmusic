@@ -1,3 +1,5 @@
+// All of this assumes western music theory where there are 12 notes.
+
 const std = @import("std");
 
 pub const Alphabet = enum(u8) {
@@ -48,16 +50,40 @@ pub const Accidental = enum {
     }
 };
 
+pub const Step = enum(u8) {
+    Half,
+    Whole,
+    Second,
+    Augmented_Second,
+    Third,
+    Fourth,
+    Fifth,
+    Sixth,
+    Seventh,
+    Octave,
+
+    pub fn value(self: Step) u8 {
+        return switch (self) {
+            .Half => 1,
+            .Whole => 2,
+            .Second => 2,
+            .Augmented_Second => 3,
+            .Third => 3,
+            .Fourth => 5,
+            .Fifth => 7,
+            .Sixth => 9,
+            .Seventh => 11,
+            .Octave => 12,
+        };
+    }
+};
+
 pub const Note = struct {
     name: Alphabet,
     accidental: Accidental,
 
     pub fn new(name: Alphabet, accidental: Accidental) Note {
         return Note{ .name = name, .accidental = accidental };
-    }
-
-    pub fn next(self: Note) Note {
-        return Note{ .name = self.name.next(), .accidental = self.accidental };
     }
 
     pub fn position(self: Note) u8 {
@@ -70,86 +96,77 @@ pub const Note = struct {
         };
     }
 
-    pub fn newFromStep(self: Note, step: u8) Note {
-        const expected = self.name.position();
-        var accidental: Accidental = .Natural;
-        if (step == expected) {
-            accidental = .Natural;
-        } else if (step == (expected + 1) % 12) {
-            accidental = .Sharp;
-        } else if (step == (expected + 11) % 12) {
-            accidental = .Flat;
-        } else if (step == (expected + 2) % 12) {
-            accidental = .DoubleSharp;
-        } else if (step == (expected + 10) % 12) {
-            accidental = .DoubleFlat;
-        }
-        return Note{ .name = self.name, .accidental = accidental };
-    }
-};
-
-pub const Scale = struct {
-    root: Note,
-    steps: []const u8,
-
-    pub fn new(root: Note, steps: []const u8) Scale {
-        return Scale{ .root = root, .steps = steps };
-    }
-
-    pub fn compute(self: Scale, notes: []Note) []Note {
-        var position: usize = 0;
-        notes[position] = self.root;
-        position += 1;
-        var note = self.root;
-        var notePosition = note.position();
-
-        for (self.steps) |step| {
-            notePosition = (notePosition + step) % 12;
-            note = note.next().newFromStep(notePosition);
-            notes[position] = note;
-            position += 1;
-        }
-        return notes[0..position];
+    pub fn stepTo(self: Note, step: Step) Note {
+        const targetPosition: i8 = @intCast((self.position() + step.value()) % 12);
+        const nextNatural = self.name.next();
+        const nextNaturalPosition: i8 = @intCast(nextNatural.position());
+        const diff: i8 = @mod(targetPosition - nextNaturalPosition + 12, 12);
+        return Note{
+            .name = nextNatural,
+            .accidental = switch (diff) {
+                0 => .Natural,
+                1 => .Sharp,
+                2 => .DoubleSharp,
+                10 => .DoubleFlat,
+                11 => .Flat,
+                else => .Natural,
+            },
+        };
     }
 };
 
 pub const Mode = enum {
-    IonianMajor, // Standard major scale.
-    LydianMajor, // Raised 4th degree, dreamy sound.
-    MixolydianMajor, // Lowered 7th degree, dominant feel.
-    PentatonicMajor, // Five notes, widely used in rock, blues, and folk.
-    BluesMajor, // Pentatonic variation with a "blue note", widely used in blues and jazz.
-    HarmonicMajor, // Augmented second interval, widly used in classical and Middle Eastern music.
-    AeolianMinor, // Standard minor scale.
-    DorianMinor, // Raised 6th degree, used in jazz and modal music.
-    PhrygianMinor, // Lowered 2nd degree, Spanish or Eastern sound.
-    LocrianMinor, // Lowered 2nd and 5th, dissonant, used in jazz and modern metal.
-    PentatonicMinor, // Omits 2nd and 6th degrees. Widely used in blues, rock, and folk music.
-    BluesMinor, // Pentatonic variation with a "blue note", widely used in blues and jazz.
-    HarmonicMinor, // Raised 7th degree, classical, or "Middle Eastern" character
-    MelodicMinor, // Raised 6th and 7th when ascending, often reverts to natural minor (Aeolian) when descending. Jazz and classical music.
+    Ionian_Major, // Standard major scale.
+    Aeolian_Minor, // Standard minor scale.
+    Lydian_Major, // Raised 4th degree, dreamy sound.
+    Mixolydian_Major, // Lowered 7th degree, dominant feel.
+    Pentatonic_Major, // Five notes, widely used in rock, blues, and folk.
+    Blues_Major, // Pentatonic variation with a "blue note", widely used in blues and jazz.
+    Harmonic_Major, // Augmented second interval, widly used in classical and Middle Eastern music.
+    Dorian_Minor, // Raised 6th degree, used in jazz and modal music.
+    Phrygian_Minor, // Lowered 2nd degree, Spanish or Eastern sound.
+    Locrian_Minor, // Lowered 2nd and 5th, dissonant, used in jazz and modern metal.
+    Pentatonic_Minor, // Omits 2nd and 6th degrees. Widely used in blues, rock, and folk music.
+    Blues_Minor, // Pentatonic variation with a "blue note", widely used in blues and jazz.
+    Harmonic_Minor, // Raised 7th degree, classical, or "Middle Eastern" character
+    Melodic_Minor, // Raised 6th and 7th when ascending, often reverts to natural _minor (Aeolian) when descending. Jazz and classical music.
     Chromatic,
     WholeTone,
 
-    pub fn steps(self: Mode) []const u8 {
+    pub fn intervals(self: Mode) []const Step {
         return switch (self) {
-            .IonianMajor => &[_]u8{ 2, 2, 1, 2, 2, 2, 1 },
-            .LydianMajor => &[_]u8{ 2, 2, 2, 1, 2, 2, 1 },
-            .MixolydianMajor => &[_]u8{ 2, 2, 1, 2, 2, 1, 2 },
-            .PentatonicMajor => &[_]u8{ 2, 2, 3, 2, 3 },
-            .BluesMajor => &[_]u8{ 2, 1, 1, 3, 2, 3 },
-            .HarmonicMajor => &[_]u8{ 2, 1, 2, 2, 1, 3, 1 },
-            .AeolianMinor => &[_]u8{ 2, 1, 2, 2, 1, 2, 2 },
-            .DorianMinor => &[_]u8{ 2, 1, 2, 2, 2, 1, 2 },
-            .PhrygianMinor => &[_]u8{ 1, 2, 2, 2, 1, 2, 2 },
-            .LocrianMinor => &[_]u8{ 1, 2, 2, 1, 2, 2, 2 },
-            .PentatonicMinor => &[_]u8{ 3, 2, 2, 3, 2 },
-            .BluesMinor => &[_]u8{ 3, 2, 1, 1, 3, 2 },
-            .HarmonicMinor => &[_]u8{ 2, 1, 2, 2, 1, 3, 1 },
-            .MelodicMinor => &[_]u8{ 2, 1, 2, 2, 2, 2, 1 },
-            .Chromatic => &[_]u8{ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
-            .WholeTone => &[_]u8{ 2, 2, 2, 2, 2, 2 },
+            .Ionian_Major => &[_]Step{ .Whole, .Whole, .Half, .Whole, .Whole, .Whole, .Half },
+            .Lydian_Major => &[_]Step{ .Whole, .Whole, .Whole, .Half, .Whole, .Whole, .Half },
+            .Mixolydian_Major => &[_]Step{ .Whole, .Whole, .Half, .Whole, .Whole, .Half, .Whole },
+            .Pentatonic_Major => &[_]Step{ .Whole, .Whole, .Third, .Whole, .Third },
+            .Blues_Major => &[_]Step{ .Whole, .Half, .Half, .Third, .Whole, .Third },
+            .Harmonic_Major => &[_]Step{ .Whole, .Half, .Whole, .Whole, .Half, .Third, .Half },
+            .Aeolian_Minor => &[_]Step{ .Whole, .Half, .Whole, .Whole, .Half, .Whole, .Whole },
+            .Dorian_Minor => &[_]Step{ .Whole, .Half, .Whole, .Whole, .Whole, .Half, .Whole },
+            .Phrygian_Minor => &[_]Step{ .Half, .Whole, .Whole, .Whole, .Half, .Whole, .Whole },
+            .Locrian_Minor => &[_]Step{ .Half, .Whole, .Whole, .Half, .Whole, .Whole, .Whole },
+            .Pentatonic_Minor => &[_]Step{ .Third, .Whole, .Whole, .Third, .Whole },
+            .Blues_Minor => &[_]Step{ .Third, .Whole, .Half, .Half, .Third, .Whole },
+            .Harmonic_Minor => &[_]Step{ .Whole, .Half, .Whole, .Whole, .Half, .Augmented_Second, .Half },
+            .Melodic_Minor => &[_]Step{ .Whole, .Half, .Whole, .Whole, .Whole, .Whole, .Half },
+            .Chromatic => &[_]Step{ .Half, .Half, .Half, .Half, .Half, .Half, .Half, .Half, .Half, .Half, .Half, .Half },
+            .WholeTone => &[_]Step{ .Whole, .Whole, .Whole, .Whole, .Whole, .Whole },
         };
+    }
+
+    pub fn scale(self: Mode, root: Note, notes: []Note) []Note {
+        var position: usize = 0;
+        notes[position] = root;
+        position += 1;
+
+        var note = root;
+        for (self.intervals()) |step| {
+            note = note.stepTo(step);
+            notes[position] = note;
+            position += 1;
+        }
+
+        return notes[0..position];
     }
 
     pub fn toString(self: Mode) []const u8 {
@@ -157,13 +174,33 @@ pub const Mode = enum {
     }
 };
 
+pub const Chord = struct {
+    key: Note,
+    mode: Mode,
+
+    pub fn build(self: Chord, startPosition: u8, notes: []Note) [3]Note {
+        const scale = self.mode.scale(self.key, notes);
+        return .{
+            scale[startPosition % scale.len],
+            scale[(startPosition + 2) % (scale.len - 1)], // Wrap within the first 7 notes
+            scale[(startPosition + 4) % (scale.len - 1)],
+        };
+    }
+};
+
 pub fn main() !void {
     var buffer: [16]Note = undefined;
-    const key = Note.new(Alphabet.E, Accidental.Flat);
-    const mode = Mode.IonianMajor;
-    const scale = Scale.new(key, mode.steps());
-    std.debug.print("Major {s}{s} {s}: ", .{ key.name.toString(), key.accidental.toString(), mode.toString() });
-    for (scale.compute(&buffer)) |note| {
+    const key = Note.new(Alphabet.F, Accidental.Sharp);
+    const mode = Mode.Harmonic_Minor;
+    const scale = mode.scale(key, &buffer);
+    std.debug.print("{s}{s} {s}: ", .{ key.name.toString(), key.accidental.toString(), mode.toString() });
+    for (scale) |note| {
+        std.debug.print("{s}{s} ", .{ note.name.toString(), note.accidental.toString() });
+    }
+    std.debug.print("\n", .{});
+    const chord = Chord{ .mode = mode, .key = key };
+    const chordNotes = chord.build(1, &buffer);
+    for (chordNotes) |note| {
         std.debug.print("{s}{s} ", .{ note.name.toString(), note.accidental.toString() });
     }
     std.debug.print("\n", .{});

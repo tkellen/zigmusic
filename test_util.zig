@@ -1,11 +1,10 @@
 const std = @import("std");
 const testing = std.testing;
-const mt = @import("./main.zig");
+const m = @import("./main.zig");
 
-pub fn validate(root: mt.Note, steps: []const u8, expected: []const mt.Note) !void {
-    var buffer: [16]mt.Note = undefined;
-    const scale = mt.Scale.new(root, steps);
-    const result = scale.compute(&buffer);
+pub fn validate(root: m.Note, mode: m.Mode, expected: []const m.Note) !void {
+    var buffer: [16]m.Note = undefined;
+    const result = mode.scale(root, &buffer);
 
     if (result.len != expected.len) {
         std.debug.print("Length mismatch: expected {}, got {}\n", .{ expected.len, result.len });
