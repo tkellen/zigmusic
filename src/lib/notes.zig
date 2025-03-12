@@ -77,6 +77,7 @@ pub const Note = struct {
 
         // Determine the next diatonic pitch by moving up in the natural (diatonic) scale.
         // This helps preserve the correct letter name of the note in a musical context.
+        // TODO: This will fail for large steps and needs refactoring.
         const nextDiatonic = self.pitch.next();
 
         // Get the chromatic position of the next diatonic note to compare it with the new chromatic position.
