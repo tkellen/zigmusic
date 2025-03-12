@@ -47,7 +47,7 @@ pub const Mode = enum {
         currentPosition += 1;
         var currentNote = root;
         for (self.intervals()) |interval| {
-            currentNote = currentNote.stepBy(interval);
+            currentNote = currentNote.chromaticStep(interval);
             buffer[currentPosition] = currentNote;
             currentPosition += 1;
         }
