@@ -40,6 +40,16 @@ pub const Accidental = enum {
     DoubleSharp,
     DoubleFlat,
 
+    pub fn offset(self: Accidental) i8 {
+        return switch (self) {
+            .Natural => 0,
+            .Sharp => 1,
+            .Flat => -1,
+            .DoubleSharp => 2,
+            .DoubleFlat => -2,
+        };
+    }
+
     pub fn name(self: Accidental) []const u8 {
         return switch (self) {
             .Natural => "",
@@ -55,39 +65,44 @@ pub const Note = struct {
     pitch: Pitch,
     accidental: Accidental,
 
-    pub fn position(self: Note) u8 {
-        return switch (self.accidental) {
-            .Natural => self.pitch.position(),
-            .Sharp => (self.pitch.position() + 1) % 12,
-            .Flat => (self.pitch.position() + 11) % 12,
-            .DoubleSharp => (self.pitch.position() + 2) % 12,
-            .DoubleFlat => (self.pitch.position() + 10) % 12,
-        };
+    pub fn chromaticPosition(self: Note) u8 {
+        const pos: i8 = @as(i8, @intCast(self.pitch.position())) + self.accidental.offset();
+        return @as(u8, @intCast(@mod(pos, 12))); // Use @mod instead of %
     }
 
     pub fn stepBy(self: Note, movement: steps.Step) Note {
-        const targetPosition: i8 = @intCast((self.position() + movement.value()) % 12);
-        const nextPitch = self.pitch.next();
-        const nextPitchPosition: i8 = @intCast(nextPitch.position());
-        const diff: i8 = @mod(targetPosition - nextPitchPosition + 12, 12);
+        // Compute the new chromatic position by adding the movement value to the current chromatic position
+        // and taking the result modulo 12 to ensure it wraps around within the 12-tone chromatic scale.
+        const newChromaticPosition: u8 = @as(u8, @intCast(@mod(@as(i8, @intCast(self.chromaticPosition())) + @as(i8, @intCast(movement.value())), 12)));
+
+        // Determine the next diatonic pitch by moving up in the natural (diatonic) scale.
+        // This helps preserve the correct letter name of the note in a musical context.
+        const nextDiatonic = self.pitch.next();
+
+        // Get the chromatic position of the next diatonic note to compare it with the new chromatic position.
+        const nextDiatonicPosition: u8 = nextDiatonic.position();
+
+        // Compute the difference (offset) between the new chromatic position and the expected diatonic position.
+        // This value determines whether an accidental needs to be applied (e.g., sharp, flat).
+        const diff: i8 = @mod(@as(i8, @intCast(newChromaticPosition)) - @as(i8, @intCast(nextDiatonicPosition)), 12);
+
+        // Determine the appropriate accidental based on the difference.
         return Note{
-            .pitch = nextPitch,
+            .pitch = nextDiatonic,
             .accidental = switch (diff) {
-                0 => .Natural,
-                1 => .Sharp,
-                2 => .DoubleSharp,
-                10 => .DoubleFlat,
-                11 => .Flat,
-                else => .Natural,
+                0 => .Natural, // No accidental needed, pitch matches exactly
+                1 => .Sharp, // One semitone above, needs a sharp.
+                2 => .DoubleSharp, // Two semitones above, needs a double sharp.
+                10 => .DoubleFlat, // Two semitones below, needs a double flat (equivalent to -2 mod 12).
+                11 => .Flat, // One semitone below, needs a flat (equivalent to -1 mod 12).
+                else => .Natural, // Default case, assumes natural note (shouldn't happen)
             },
         };
     }
 
     pub fn name(self: Note) []const u8 {
-        const result = std.fmt.allocPrint(allocator, "{s}{s}", .{
-            @tagName(self.pitch),
-            self.accidental.name(),
+        return std.fmt.allocPrint(std.heap.page_allocator, "{s}{s}", .{
+            @tagName(self.pitch), self.accidental.name(),
         }) catch return "<Error>";
-        return result;
     }
 };
