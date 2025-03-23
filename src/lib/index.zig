@@ -1,8 +1,8 @@
-pub const notes = @import("notes.zig");
-pub const modes = @import("modes.zig");
-pub const scales = @import("scales.zig");
+pub const note = @import("note.zig");
+pub const scale = @import("scale.zig");
+pub const printer = @import("printer.zig");
 
 test {
-    _ = @import("./test_notes.zig");
-    _ = @import("./test_modes.zig");
+    _ = @import("./test_note.zig");
+    _ = @import("./test_scale.zig");
 }
