@@ -1,8 +1,6 @@
 const std = @import("std");
-const music = @import("music");
-const Note = music.notes.Note;
-const Mode = music.modes.Mode;
-const Scale = music.scales.Scale;
+const core = @import("core");
+const scales = @import("scales");
 
 pub fn main() !void {
     const args = std.process.argsAlloc(std.heap.page_allocator) catch unreachable;
@@ -18,24 +16,23 @@ pub fn main() !void {
         return;
     }
 
-    const mode = Mode.parse(args[2]) orelse {
-        std.debug.print("Invalid mode: {s}\n", .{args[2]});
-        std.debug.print("Valid modes:\n", .{});
-        for (std.meta.tags(Mode)) |m| {
-            std.debug.print("{s}\n", .{@tagName(m)});
-        }
-        return;
-    };
+    // const mode = Mode.parse(args[2]) orelse {
+    //     std.debug.print("Invalid mode: {s}\n", .{args[2]});
+    //     std.debug.print("Valid modes:\n", .{});
+    //     for (std.meta.tags(Mode)) |m| {
+    //         std.debug.print("{s}\n", .{@tagName(m)});
+    //     }
+    //     return;
+    // };
 
-    const key = try Note.parse(args[3]);
+    // const key = try Note.parse(args[3]);
 
-    var buffer: [16]Note = undefined;
-    const scale = Scale{ .mode = mode };
-    const notes = scale.build(key, &buffer);
+    // var buffer: [16]Note = undefined;
+    // const notes = Mode.build(key, &buffer);
 
-    std.debug.print("{s}{s} {s}: ", .{ key.natural.name(), key.accidental.name(), mode.name() });
-    for (notes) |note| {
-        std.debug.print("{s}{s} ", .{ note.natural.name(), note.accidental.name() });
-    }
-    std.debug.print("\n", .{});
+    // std.debug.print("{s}{s} {s}: ", .{ key.natural.name(), key.accidental.name(), mode.name() });
+    // for (notes) |note| {
+    //     std.debug.print("{s}{s} ", .{ note.natural.name(), note.accidental.name() });
+    // }
+    // std.debug.print("\n", .{});
 }
