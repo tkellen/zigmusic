@@ -1,5 +1,5 @@
-# musictheory
-> learn it and zig at the same time
+# zigmusic
+> learn music theory and zig at the same time
 
 ## What can it do?
 ```

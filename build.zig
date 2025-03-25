@@ -4,65 +4,53 @@ pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
-    const exe_mod = b.createModule(.{
-        .root_source_file = b.path("src/main.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
+    const core = b.createModule(.{ .root_source_file = b.path("src/core/index.zig"), .target = target, .optimize = optimize });
+    const scale = b.createModule(.{ .root_source_file = b.path("src/scale/index.zig"), .target = target, .optimize = optimize });
+    const chord = b.createModule(.{ .root_source_file = b.path("src/chord/index.zig"), .target = target, .optimize = optimize });
+    const style = b.createModule(.{ .root_source_file = b.path("src/style/index.zig"), .target = target, .optimize = optimize });
+    const cli = b.createModule(.{ .root_source_file = b.path("src/cli/index.zig"), .target = target, .optimize = optimize });
+    const exe = b.createModule(.{ .root_source_file = b.path("src/index.zig"), .target = target, .optimize = optimize });
 
-    const core_mod = b.createModule(.{
-        .root_source_file = b.path("src/core/index.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
+    scale.addImport("core", core);
+    chord.addImport("scale", scale);
+    chord.addImport("core", core);
+    style.addImport("core", core);
+    style.addImport("scale", scale);
+    cli.addImport("core", core);
+    cli.addImport("scale", scale);
+    cli.addImport("chord", scale);
+    cli.addImport("style", style);
+    exe.addImport("cli", cli);
 
-    const scales_mod = b.createModule(.{
-        .root_source_file = b.path("src/scales/index.zig"),
-        .target = target,
-        .optimize = optimize,
-    });
+    const core_test = b.addTest(.{ .root_module = core });
+    const scale_test = b.addTest(.{ .root_module = scale });
+    const chord_test = b.addTest(.{ .root_module = chord });
+    const style_test = b.addTest(.{ .root_module = style });
+    const cli_test = b.addTest(.{ .root_module = cli });
+    const exe_test = b.addTest(.{ .root_module = exe });
 
-    scales_mod.addImport("core", core_mod);
-    exe_mod.addImport("core", core_mod);
-    exe_mod.addImport("scales", scales_mod);
+    const run_core_test = b.addRunArtifact(core_test);
+    const run_scale_test = b.addRunArtifact(scale_test);
+    const run_chord_test = b.addRunArtifact(chord_test);
+    const run_style_test = b.addRunArtifact(style_test);
+    const run_cli_test = b.addRunArtifact(cli_test);
+    const run_exe_test = b.addRunArtifact(exe_test);
 
-    const exe = b.addExecutable(.{ .name = "foo", .root_module = exe_mod });
+    const test_step = b.step("test", "Run unit tests");
+    test_step.dependOn(&run_core_test.step);
+    test_step.dependOn(&run_scale_test.step);
+    test_step.dependOn(&run_chord_test.step);
+    test_step.dependOn(&run_style_test.step);
+    test_step.dependOn(&run_cli_test.step);
+    test_step.dependOn(&run_exe_test.step);
 
-    // This declares intent for the executable to be installed into the
-    // standard location when the user invokes the "install" step (the default
-    // step when running `zig build`).
-    b.installArtifact(exe);
-
-    // This *creates* a Run step in the build graph, to be executed when another
-    // step is evaluated that depends on it. The next line below will establish
-    // such a dependency.
-    const run_cmd = b.addRunArtifact(exe);
-
-    // By making the run step depend on the install step, it will be run from the
-    // installation directory rather than directly from within the cache directory.
-    // This is not necessary, however, if the application depends on other installed
-    // files, this ensures they will be present and in the expected location.
+    const zmusic = b.addExecutable(.{ .name = "zmusic", .root_module = exe });
+    b.installArtifact(zmusic);
+    const run_cmd = b.addRunArtifact(zmusic);
     run_cmd.step.dependOn(b.getInstallStep());
-
-    // This allows the user to pass arguments to the application in the build
-    // command itself, like this: `zig build run -- arg1 arg2 etc`
     if (b.args) |args| {
         run_cmd.addArgs(args);
     }
-
     const run_step = b.step("run", "Run the app");
     run_step.dependOn(&run_cmd.step);
-
-    const core_unit_tests = b.addTest(.{ .root_module = core_mod });
-    const scale_unit_tests = b.addTest(.{ .root_module = scales_mod });
-    const exe_unit_tests = b.addTest(.{ .root_module = exe_mod });
-
-    const run_core_unit_tests = b.addRunArtifact(core_unit_tests);
-    const run_scales_unit_tests = b.addRunArtifact(scale_unit_tests);
-    const run_exe_unit_tests = b.addRunArtifact(exe_unit_tests);
-
-    const test_step = b.step("test", "Run unit tests");
-    test_step.dependOn(&run_core_unit_tests.step);
-    test_step.dependOn(&run_scales_unit_tests.step);
-    test_step.dependOn(&run_exe_unit_tests.step);
 }

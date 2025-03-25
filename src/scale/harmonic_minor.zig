@@ -15,7 +15,7 @@ pub const HarmonicMinor = enum(u8) {
     Lydian2 = 5,
     UltraLocrian = 6,
 
-    pub const steps = [7]core.Step{
+    const steps = [7]core.Step{
         .Whole,
         .Half,
         .Whole,
@@ -25,11 +25,7 @@ pub const HarmonicMinor = enum(u8) {
         .Half,
     };
 
-    pub fn name(self: HarmonicMinor) []const u8 {
-        return @tagName(self);
-    }
-
-    pub fn rotateSteps(self: HarmonicMinor) [7]core.Step {
+    fn rotateSteps(self: HarmonicMinor) [7]core.Step {
         var rotated: [7]core.Step = undefined;
         inline for (0..7) |i| {
             rotated[i] = steps[(@intFromEnum(self) + i) % steps.len];
@@ -37,7 +33,7 @@ pub const HarmonicMinor = enum(u8) {
         return rotated;
     }
 
-    pub fn scale(self: HarmonicMinor, root: core.Note) [8]core.Note {
+    pub fn build(self: HarmonicMinor, root: core.Note) [8]core.Note {
         var result: [8]core.Note = undefined;
         result[0] = root;
         var note = root;
@@ -52,9 +48,9 @@ pub const HarmonicMinor = enum(u8) {
     }
 };
 
-// test data from: https://everythingmusic.com/learn/music-theory/scales
+// test data from: https://everythingmusic.com/learn/music-theory/scale
 test "Harmonic Minor - Root" {
-    const generator = HarmonicMinor.Root;
+    const scale = HarmonicMinor.Root;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D♭ E𝄫 F♭ G♭ A𝄫 B♭ C♭" },
         .{ .root = "C", .expected = "C D E♭ F G A♭ B C" },
@@ -75,15 +71,15 @@ test "Harmonic Minor - Root" {
         .{ .root = "B", .expected = "B C♯ D E F♯ G A♯ B" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
         //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Harmonic Minor - Locrian6" {
-    const generator = HarmonicMinor.Locrian6;
+    const scale = HarmonicMinor.Locrian6;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D𝄫 E𝄫 F♭ G𝄫 A♭ B𝄫 C♭" },
         .{ .root = "C", .expected = "C D♭ E♭ F G♭ A B♭ C" },
@@ -104,15 +100,15 @@ test "Harmonic Minor - Locrian6" {
         .{ .root = "B♭", .expected = "B♭ C♭ D♭ E♭ F♭ G A♭ B♭" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
         //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Harmonic Minor - IonianAugmented" {
-    const generator = HarmonicMinor.IonianAugmented;
+    const scale = HarmonicMinor.IonianAugmented;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D♭ E♭ F♭ G A♭ B♭ C♭" },
         .{ .root = "C", .expected = "C D E F G♯ A B C" },
@@ -133,15 +129,15 @@ test "Harmonic Minor - IonianAugmented" {
         .{ .root = "B♭", .expected = "B♭ C D E♭ F♯ G A B♭" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
         //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Harmonic Minor - Dorian4" {
-    const generator = HarmonicMinor.Dorian4;
+    const scale = HarmonicMinor.Dorian4;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D♭ E𝄫 F G♭ A♭ B𝄫 C♭" },
         .{ .root = "C", .expected = "C D E♭ F♯ G A B♭ C" },
@@ -162,15 +158,15 @@ test "Harmonic Minor - Dorian4" {
         .{ .root = "B♭", .expected = "B♭ C D♭ E F G A♭ B♭" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
         //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Harmonic Minor - PhrygianDominant" {
-    const generator = HarmonicMinor.PhrygianDominant;
+    const scale = HarmonicMinor.PhrygianDominant;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D𝄫 E♭ F♭ G♭ A𝄫 B𝄫 C♭" },
         .{ .root = "C", .expected = "C D♭ E F G A♭ B♭ C" },
@@ -191,8 +187,8 @@ test "Harmonic Minor - PhrygianDominant" {
         .{ .root = "B♭", .expected = "B♭ C♭ D E♭ F G♭ A♭ B♭" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
         //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
@@ -219,15 +215,15 @@ test "Harmonic Minor - PhrygianDominant" {
 //         .{ .root = "B♭", .expected = "B♭ C♭ D♭ E𝄫 F♭ G♭ A𝄫 B♭" },
 //     }) |case| {
 //         const root = try Note.parse(case.root);
-//         const scale = Mode.Lydian2.scale(root);
-//         var printer = Printer(8).init(scale);
+//         const scale = Mode.Lydian2.generate(root);
+//         var printer = Printer(8).init(notes);
 // //         std.debug.print("{s}{s} | got: {s} expected: {s}\n", .{ root.natural.name(), root.accidental.name(), printer.string(), case.expected });
 //         //try std.testing.expectEqualStrings(case.expected, printer.string());
 //     }
 // }
 
 test "Harmonic Minor - UltraLocrian" {
-    const generator = HarmonicMinor.UltraLocrian;
+    const scale = HarmonicMinor.UltraLocrian;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         //.{ .root = "C♭", .expected = "" },
         .{ .root = "C", .expected = "C D♭ E♭ F♭ G♭ A♭ B𝄫 C" },
@@ -248,8 +244,8 @@ test "Harmonic Minor - UltraLocrian" {
         .{ .root = "B♭", .expected = "B♭ C♭ D♭ E𝄫 F♭ G♭ A𝄫 B♭" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
         //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }

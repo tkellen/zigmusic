@@ -7,15 +7,15 @@ pub fn Printer(comptime N: usize) type {
     return struct {
         notes: [N]Note,
         buffer: [MaxLen]u8 = undefined,
-        used_len: usize = 0,
+        used: usize = 0,
         pub fn init(input: [N]Note) @This() {
             return .{ .notes = input };
         }
         pub fn string(self: *@This()) []const u8 {
             var index: usize = 0;
-            var name_buf: [5]u8 = undefined;
+            var buffer: [5]u8 = undefined;
             for (self.notes, 0..) |note, i| {
-                const name = note.nameWithBuffer(name_buf[0..]);
+                const name = note.name(&buffer);
                 std.mem.copyForwards(u8, self.buffer[index..][0..name.len], name);
                 index += name.len;
                 if (i != self.notes.len - 1) {
@@ -23,7 +23,7 @@ pub fn Printer(comptime N: usize) type {
                     index += 1;
                 }
             }
-            self.used_len = index;
+            self.used = index;
             return self.buffer[0..index];
         }
     };

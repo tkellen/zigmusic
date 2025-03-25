@@ -15,7 +15,7 @@ pub const Diatonic = enum(u8) {
     Aeolian = 5,
     Locrian = 6,
 
-    pub const steps = [7]core.Step{
+    const steps = [7]core.Step{
         .Whole,
         .Whole,
         .Half,
@@ -25,15 +25,7 @@ pub const Diatonic = enum(u8) {
         .Half,
     };
 
-    pub fn name(self: Diatonic) []const u8 {
-        return @tagName(self);
-    }
-
-    pub fn parse(input: []const u8) ?Diatonic {
-        return std.meta.stringToEnum(Diatonic, input);
-    }
-
-    pub fn rotateSteps(self: Diatonic) [7]core.Step {
+    fn rotateSteps(self: Diatonic) [7]core.Step {
         var rotated: [7]core.Step = undefined;
         inline for (0..7) |i| {
             rotated[i] = steps[(@intFromEnum(self) + i) % steps.len];
@@ -41,7 +33,7 @@ pub const Diatonic = enum(u8) {
         return rotated;
     }
 
-    pub fn scale(self: Diatonic, root: core.Note) [8]core.Note {
+    pub fn build(self: Diatonic, root: core.Note) [8]core.Note {
         var result: [8]core.Note = undefined;
         result[0] = root;
         var note = root;
@@ -56,9 +48,9 @@ pub const Diatonic = enum(u8) {
     }
 };
 
-// test data from: https://everythingmusic.com/learn/music-theory/scales
+// test data from: https://everythingmusic.com/learn/music-theory/scale
 test "Diatonic - Ionian" {
-    const generator = Diatonic.Ionian;
+    const scale = Diatonic.Ionian;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D♭ E♭ F♭ G♭ A♭ B♭ C♭" },
         .{ .root = "C", .expected = "C D E F G A B C" },
@@ -83,15 +75,15 @@ test "Diatonic - Ionian" {
         .{ .root = "B♯", .expected = "B♯ C𝄪 D𝄪 E♯ F𝄪 G𝄪 A𝄪 B♯" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
-        //std.debug.print("{s} {s}{s} | got: {s} expected: {s}\n", .{ generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
+        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Diatonic - Dorian" {
-    const generator = Diatonic.Dorian;
+    const scale = Diatonic.Dorian;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D♭ E𝄫 F♭ G♭ A♭ B𝄫 C♭" },
         .{ .root = "C", .expected = "C D E♭ F G A B♭ C" },
@@ -115,15 +107,15 @@ test "Diatonic - Dorian" {
         .{ .root = "B♯", .expected = "B♯ C𝄪 D♯ E♯ F𝄪 G𝄪 A♯ B♯" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
-        //std.debug.print("{s} {s}{s} | got: {s} expected: {s}\n", .{ generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
+        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Diatonic - Phrygian" {
-    const generator = Diatonic.Phrygian;
+    const scale = Diatonic.Phrygian;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D𝄫 E𝄫 F♭ G♭ A𝄫 B𝄫 C♭" },
         .{ .root = "C", .expected = "C D♭ E♭ F G A♭ B♭ C" },
@@ -147,15 +139,15 @@ test "Diatonic - Phrygian" {
         .{ .root = "B♯", .expected = "B♯ C♯ D♯ E♯ F𝄪 G♯ A♯ B♯" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
-        //std.debug.print("{s} {s}{s} | got: {s} expected: {s}\n", .{ generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
+        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Diatonic - Lydian" {
-    const generator = Diatonic.Lydian;
+    const scale = Diatonic.Lydian;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D♭ E♭ F G♭ A♭ B♭ C♭" },
         .{ .root = "C", .expected = "C D E F♯ G A B C" },
@@ -178,15 +170,15 @@ test "Diatonic - Lydian" {
         .{ .root = "B", .expected = "B C♯ D♯ E♯ F♯ G♯ A♯ B" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
-        //std.debug.print("{s} {s}{s} | got: {s} expected: {s}\n", .{ generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
+        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Diatonic - Mixolydian" {
-    const generator = Diatonic.Mixolydian;
+    const scale = Diatonic.Mixolydian;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D♭ E♭ F♭ G♭ A♭ B𝄫 C♭" },
         .{ .root = "C", .expected = "C D E F G A B♭ C" },
@@ -209,15 +201,15 @@ test "Diatonic - Mixolydian" {
         .{ .root = "B", .expected = "B C♯ D♯ E F♯ G♯ A B" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
-        //std.debug.print("{s} {s}{s} | got: {s} expected: {s}\n", .{ generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
+        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Diatonic - Aeolian (Minor)" {
-    const generator = Diatonic.Aeolian;
+    const scale = Diatonic.Aeolian;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D♭ E𝄫 F♭ G♭ A𝄫 B𝄫 C♭" },
         .{ .root = "C", .expected = "C D E♭ F G A♭ B♭ C" },
@@ -241,15 +233,15 @@ test "Diatonic - Aeolian (Minor)" {
         .{ .root = "B♯", .expected = "B♯ C𝄪 D♯ E♯ F𝄪 G♯ A♯ B♯" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
-        //std.debug.print("{s} {s}{s} | got: {s} expected: {s}\n", .{ generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
+        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }
 
 test "Diatonic - Locrian" {
-    const generator = Diatonic.Locrian;
+    const scale = Diatonic.Locrian;
     for ([_]struct { root: []const u8, expected: []const u8 }{
         .{ .root = "C♭", .expected = "C♭ D𝄫 E𝄫 F♭ G𝄫 A𝄫 B𝄫 C♭" },
         .{ .root = "C", .expected = "C D♭ E♭ F G♭ A♭ B♭ C" },
@@ -272,9 +264,9 @@ test "Diatonic - Locrian" {
         .{ .root = "B", .expected = "B C D E F G A B" },
     }) |case| {
         const root = try Note.parse(case.root);
-        const scale = generator.scale(root);
-        var printer = Printer(8).init(scale);
-        //std.debug.print("{s} {s}{s} | got: {s} expected: {s}\n", .{ generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
+        const notes = scale.build(root);
+        var printer = Printer(8).init(notes);
+        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
         try std.testing.expectEqualStrings(case.expected, printer.string());
     }
 }

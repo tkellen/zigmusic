@@ -29,12 +29,7 @@ pub const Note = struct {
         };
     }
 
-    pub fn name(self: Note) []const u8 {
-        var local_buf: [5]u8 = undefined;
-        return self.nameWithBuffer(local_buf[0..]);
-    }
-
-    pub fn nameWithBuffer(self: Note, buf: []u8) []const u8 {
+    pub fn name(self: Note, buf: []u8) []const u8 {
         const l = self.natural.name();
         const a = self.accidental.name();
         const total = l.len + a.len;
