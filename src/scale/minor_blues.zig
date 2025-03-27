@@ -5,7 +5,7 @@
 // const Note = core.Note;
 // const Step = core.Step;
 // const Enharmonic = core.Enharmonic;
-// const Printer = core.Printer;
+// const Phrase = core.Phrase;
 
 // pub const MinorBlues = struct {
 //     const steps = [6]Step{
@@ -33,7 +33,7 @@
 //         var result: [7]Note = undefined;
 //         result[0] = root;
 //         // Get the letter pattern offsets for this scale.
-//         const letterPattern = pickPattern(root);
+//         const letterPattern = pickPattern(tonic);
 //         var currentNote = root;
 //         var currentPos = root.chromaticPosition();
 
@@ -112,10 +112,10 @@
 //         .{ .root = "B", .expected = "B D E F F♯ A B" }, // FAILING
 //         .{ .root = "B♯", .expected = "B♯ D♯ E♯ F♯ F𝄪 A♯ B♯" },
 //     }) |case| {
-//         const root = try Note.parse(case.root);
-//         const notes = scale.build(root);
-//         var printer = Printer(7).init(notes);
-//         //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-//         try std.testing.expectEqualStrings(case.expected, printer.string());
+//         const tonic = try Note.parse(case.root);
+//         const phrase = Printer(7)
+//         phrase.init(scale.build(tonic));
+//         //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ generator.name(), root.name, actual.notes(), case.expected });
+//         try std.testing.expectEqualStrings(case.expected, actual.notes());
 //     }
 // }

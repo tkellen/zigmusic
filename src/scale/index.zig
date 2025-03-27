@@ -1,6 +1,6 @@
 const std = @import("std");
 const Note = @import("core").Note;
-
+pub const Degree = @import("degree.zig").Degree;
 pub const Chromatic = @import("chromatic.zig").Chromatic;
 pub const Diatonic = @import("diatonic.zig").Diatonic;
 pub const HarmonicMajor = @import("harmonic_major.zig").HarmonicMajor;

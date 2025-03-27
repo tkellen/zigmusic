@@ -5,7 +5,7 @@ const Accidental = core.Accidental;
 const Note = core.Note;
 const Step = core.Step;
 const Enharmonic = core.Enharmonic;
-const Printer = core.Printer;
+const Phrase = core.Phrase;
 
 pub const Chromatic = struct {
     const steps = [12]core.Step{
@@ -85,10 +85,9 @@ pub const Chromatic = struct {
 //         .{ .root = "B", .expected = "B C C♯ D D♯ E F F♯ G G♯ A A♯ B" },
 //         .{ .root = "B♯", .expected = "B♯ C♯ D D♯ E F F♯ G G♯ A A♯ B B♯" },
 //     }) |case| {
-//         const root = try Note.parse(case.root);
-//         const notes = scale.build(root);
-//         var printer = Printer(13).init(notes);
-//         //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-//         try std.testing.expectEqualStrings(case.expected, printer.string());
+//         const tonic = try Note.parse(case.root);
+//         const actual = Phrase(13).init(scale.build(tonic));
+//         //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ .generator.name(), root.name, phrase.notes,case.expected });
+//         try std.testing.expectEqualStrings(case.expected, actual.notes());
 //     }
 // }

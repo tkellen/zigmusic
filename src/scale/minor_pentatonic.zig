@@ -4,7 +4,7 @@ const Letter = core.Letter;
 const Accidental = core.Accidental;
 const Note = core.Note;
 const Step = core.Step;
-const Printer = core.Printer;
+const Phrase = core.Phrase;
 
 pub const MinorPentatonic = struct {
     const steps = [5]core.Step{
@@ -57,10 +57,9 @@ test "Minor Pentatonic" {
         .{ .root = "B", .expected = "B D E F♯ A B" },
         .{ .root = "B♯", .expected = "B♯ D♯ E♯ F𝄪 A♯ B♯" },
     }) |case| {
-        const root = try Note.parse(case.root);
-        const notes = scale.build(root);
-        var printer = Printer(6).init(notes);
-        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-        try std.testing.expectEqualStrings(case.expected, printer.string());
+        const tonic = try Note.parse(case.root);
+        const actual = Phrase(6).init(scale.build(tonic));
+        //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ .generator.name(), root.name, actual.notes(), case.expected });
+        try std.testing.expectEqualStrings(case.expected, actual.notes());
     }
 }

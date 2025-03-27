@@ -20,6 +20,10 @@ pub const Step = enum(u8) {
     Major7th,
     PerfectOctave,
 
+    pub fn parse(input: []const u8) ?Step {
+        return std.meta.stringToEnum(Step, input);
+    }
+
     pub fn chromaticInterval(interval: Step) u8 {
         return switch (interval) {
             .PerfectUnison => 0,
@@ -40,9 +44,5 @@ pub const Step = enum(u8) {
 
     pub fn chromaticPositionFrom(self: Step, note: Note) u8 {
         return @mod(note.chromaticPosition() + self.chromaticInterval(), 12);
-    }
-
-    pub fn parse(input: []const u8) ?Step {
-        return std.meta.stringToEnum(Step, input);
     }
 };

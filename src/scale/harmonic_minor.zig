@@ -4,7 +4,7 @@ const Letter = core.Letter;
 const Accidental = core.Accidental;
 const Note = core.Note;
 const Step = core.Step;
-const Printer = core.Printer;
+const Phrase = core.Phrase;
 
 pub const HarmonicMinor = enum(u8) {
     Root = 0,
@@ -70,11 +70,10 @@ test "Harmonic Minor - Root" {
         .{ .root = "B♭", .expected = "B♭ C D♭ E♭ F G♭ A B♭" },
         .{ .root = "B", .expected = "B C♯ D E F♯ G A♯ B" },
     }) |case| {
-        const root = try Note.parse(case.root);
-        const notes = scale.build(root);
-        var printer = Printer(8).init(notes);
-        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-        try std.testing.expectEqualStrings(case.expected, printer.string());
+        const tonic = try Note.parse(case.root);
+        const actual = Phrase(8).init(scale.build(tonic));
+        //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ .generator.name(), root.name, actual.notes(), case.expected });
+        try std.testing.expectEqualStrings(case.expected, actual.notes());
     }
 }
 
@@ -99,11 +98,10 @@ test "Harmonic Minor - Locrian6" {
         .{ .root = "B", .expected = "B C D E F G♯ A B" },
         .{ .root = "B♭", .expected = "B♭ C♭ D♭ E♭ F♭ G A♭ B♭" },
     }) |case| {
-        const root = try Note.parse(case.root);
-        const notes = scale.build(root);
-        var printer = Printer(8).init(notes);
-        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-        try std.testing.expectEqualStrings(case.expected, printer.string());
+        const tonic = try Note.parse(case.root);
+        const actual = Phrase(8).init(scale.build(tonic));
+        //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ .generator.name(), root.name, actual.notes(), case.expected });
+        try std.testing.expectEqualStrings(case.expected, actual.notes());
     }
 }
 
@@ -128,11 +126,10 @@ test "Harmonic Minor - IonianAugmented" {
         .{ .root = "B", .expected = "B C♯ D♯ E F𝄪 G♯ A♯ B" },
         .{ .root = "B♭", .expected = "B♭ C D E♭ F♯ G A B♭" },
     }) |case| {
-        const root = try Note.parse(case.root);
-        const notes = scale.build(root);
-        var printer = Printer(8).init(notes);
-        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-        try std.testing.expectEqualStrings(case.expected, printer.string());
+        const tonic = try Note.parse(case.root);
+        const actual = Phrase(8).init(scale.build(tonic));
+        //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ .generator.name(), root.name, actual.notes(), case.expected });
+        try std.testing.expectEqualStrings(case.expected, actual.notes());
     }
 }
 
@@ -157,11 +154,10 @@ test "Harmonic Minor - Dorian4" {
         .{ .root = "B", .expected = "B C♯ D E♯ F♯ G♯ A B" },
         .{ .root = "B♭", .expected = "B♭ C D♭ E F G A♭ B♭" },
     }) |case| {
-        const root = try Note.parse(case.root);
-        const notes = scale.build(root);
-        var printer = Printer(8).init(notes);
-        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-        try std.testing.expectEqualStrings(case.expected, printer.string());
+        const tonic = try Note.parse(case.root);
+        const actual = Phrase(8).init(scale.build(tonic));
+        //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ .generator.name(), root.name, actual.notes(), case.expected });
+        try std.testing.expectEqualStrings(case.expected, actual.notes());
     }
 }
 
@@ -186,11 +182,10 @@ test "Harmonic Minor - PhrygianDominant" {
         .{ .root = "B", .expected = "B C D♯ E F♯ G A B" },
         .{ .root = "B♭", .expected = "B♭ C♭ D E♭ F G♭ A♭ B♭" },
     }) |case| {
-        const root = try Note.parse(case.root);
-        const notes = scale.build(root);
-        var printer = Printer(8).init(notes);
-        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-        try std.testing.expectEqualStrings(case.expected, printer.string());
+        const tonic = try Note.parse(case.root);
+        const actual = Phrase(8).init(scale.build(tonic));
+        //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ .generator.name(), root.name, actual.notes(), case.expected });
+        try std.testing.expectEqualStrings(case.expected, actual.notes());
     }
 }
 
@@ -214,11 +209,12 @@ test "Harmonic Minor - PhrygianDominant" {
 //         .{ .root = "B", .expected = "B C D E♭ F G A♭ B" },
 //         .{ .root = "B♭", .expected = "B♭ C♭ D♭ E𝄫 F♭ G♭ A𝄫 B♭" },
 //     }) |case| {
-//         const root = try Note.parse(case.root);
-//         const scale = Mode.Lydian2.generate(root);
-//         var printer = Printer(8).init(notes);
-// //         std.debug.print("{s}{s} | got: {s} expected: {s}\n", .{ root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-//         //try std.testing.expectEqualStrings(case.expected, printer.string());
+//         const tonic = try Note.parse(case.root);
+//         const scale = Mode.Lydian2.generate(tonic);
+//         const actual = Phrase(8);
+//         phrase.init(notes);
+//         std.debug.print("{s}{s} | got: {s} expected: {s}\n", .{ root.name, actual.notes(), case.expected });
+//         //try std.testing.expectEqualStrings(case.expected, actual.notes());
 //     }
 // }
 
@@ -243,10 +239,9 @@ test "Harmonic Minor - UltraLocrian" {
         .{ .root = "B", .expected = "B C D E♭ F G A♭ B" },
         .{ .root = "B♭", .expected = "B♭ C♭ D♭ E𝄫 F♭ G♭ A𝄫 B♭" },
     }) |case| {
-        const root = try Note.parse(case.root);
-        const notes = scale.build(root);
-        var printer = Printer(8).init(notes);
-        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ .generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-        try std.testing.expectEqualStrings(case.expected, printer.string());
+        const tonic = try Note.parse(case.root);
+        const actual = Phrase(8).init(scale.build(tonic));
+        //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ .generator.name(), root.name, actual.notes(), case.expected });
+        try std.testing.expectEqualStrings(case.expected, actual.notes());
     }
 }

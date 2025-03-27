@@ -4,7 +4,7 @@ const Letter = core.Letter;
 const Accidental = core.Accidental;
 const Note = core.Note;
 const Step = core.Step;
-const Printer = core.Printer;
+const Phrase = core.Phrase;
 
 pub const MajorBlues = struct {
     const steps = [6]Step{
@@ -59,10 +59,9 @@ test "Major Blues" {
         .{ .root = "B", .expected = "B C♯ D D♯ F♯ G♯ B" },
         .{ .root = "B♯", .expected = "B♯ C𝄪 D♯ D𝄪 F𝄪 G𝄪 B♯" },
     }) |case| {
-        const root = try Note.parse(case.root);
-        const notes = scale.build(root);
-        var printer = Printer(7).init(notes);
-        //std.debug.print("{s}: {s}{s} | got: {s} expected: {s}\n", .{ generator.name(), root.natural.name(), root.accidental.name(), printer.string(), case.expected });
-        try std.testing.expectEqualStrings(case.expected, printer.string());
+        const tonic = try Note.parse(case.root);
+        const actual = Phrase(7).init(scale.build(tonic));
+        //std.debug.print("{s}: {s} | got: {s} expected: {s}\n", .{ generator.name(), root.name, actual.notes(), case.expected });
+        try std.testing.expectEqualStrings(case.expected, actual.notes());
     }
 }

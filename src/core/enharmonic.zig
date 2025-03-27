@@ -2,17 +2,14 @@ const std = @import("std");
 const Note = @import("note.zig").Note;
 const Letter = @import("letter.zig").Letter;
 const Accidental = @import("accidental.zig").Accidental;
-const Printer = @import("printer.zig").Printer;
+const Phrase = @import("phrase.zig").Phrase;
 
 pub fn equivalents(position: u8, buffer: []Note) usize {
     const pos: u8 = @intCast(@mod(@as(i8, @intCast(position)), 12));
     var count: usize = 0;
     for (std.meta.tags(Letter)) |letter| {
         for (std.meta.tags(Accidental)) |accidental| {
-            const candidate = Note{
-                .natural = letter,
-                .accidental = accidental,
-            };
+            const candidate = Note.init(letter, accidental);
             if (candidate.chromaticPosition() == pos) {
                 buffer[count] = candidate;
                 count += 1;
@@ -69,7 +66,7 @@ test "equivalents" {
         const check = try Note.parse(case.note);
         var result: [case.count]Note = undefined;
         _ = equivalents(check.chromaticPosition(), &result);
-        var printer = Printer(case.count).init(result);
-        try std.testing.expectEqualStrings(case.expected, printer.string());
+        const actual = Phrase(case.count).init(result);
+        try std.testing.expectEqualStrings(case.expected, actual.notes());
     }
 }

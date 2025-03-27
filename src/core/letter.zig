@@ -9,6 +9,10 @@ pub const Letter = enum(u8) {
     A = 5,
     B = 6,
 
+    pub fn parse(input: []const u8) ?Letter {
+        return std.meta.stringToEnum(Letter, input);
+    }
+
     pub fn chromaticPosition(self: Letter) u8 {
         return switch (self) {
             .C => 0,
@@ -37,9 +41,5 @@ pub const Letter = enum(u8) {
 
     pub fn name(self: Letter) []const u8 {
         return @tagName(self);
-    }
-
-    pub fn parse(input: []const u8) ?Letter {
-        return std.meta.stringToEnum(Letter, input);
     }
 };
